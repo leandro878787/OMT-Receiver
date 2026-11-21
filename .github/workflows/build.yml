@@ -1,0 +1,50 @@
+name: Build OMT Receiver
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout OMT Receiver
+        uses: actions/checkout@v4
+
+      - name: Checkout Resolume FFGL SDK
+        uses: actions/checkout@v4
+        with:
+          repository: resolume/ffgl
+          ref: master
+          path: external/ffgl
+
+      - name: Checkout OMT reference package
+        uses: actions/checkout@v4
+        with:
+          repository: tomspace/ffgl-omt
+          ref: main
+          path: external/ffgl-omt
+
+      - name: Configure
+        run: >
+          cmake -S src -B build -A x64
+          -DFFGL_ROOT="${{ github.workspace }}/external/ffgl"
+          -DLIBOMT_ROOT="${{ github.workspace }}/external/ffgl-omt/src/deps/libomt"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package plugin
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path package | Out-Null
+          Copy-Item build/Release/OMTReceiver.dll package/
+          Copy-Item build/Release/libomt.dll,build/Release/libvmx.dll,build/Release/libomtnet.dll package/
+
+      - name: Upload OMT Receiver
+        uses: actions/upload-artifact@v4
+        with:
+          name: OMT-Receiver-Windows-x64
+          path: package/
+          if-no-files-found: error
