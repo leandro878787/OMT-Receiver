@@ -38,12 +38,12 @@ target_include_directories(OMTReceiver PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/source/shared"
   "${FFGL_ROOT}/source/lib"
   "${FFGL_ROOT}/source/lib/ffglex"
-  "${FFGL_ROOT}/deps/glew/include"
+  "${FFGL_ROOT}/deps/glew-2.1.0/include"
 )
 target_compile_definitions(OMTReceiver PRIVATE GLEW_STATIC)
 target_link_libraries(OMTReceiver PRIVATE
   libomt
-  "${FFGL_ROOT}/deps/glew/lib/Release/x64/glew32s.lib"
+  "${FFGL_ROOT}/deps/glew-2.1.0/lib/Release/x64/glew32s.lib"
   opengl32.lib
 )
 
